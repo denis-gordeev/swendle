@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Topic:{{topic}}</h2>
+    <ul>
+        {% for post in posts %}
+<li> <a href="/stories/{{ post.story_id}}">{{post.story_name}}</a> </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

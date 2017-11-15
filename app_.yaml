@@ -1,0 +1,26 @@
+# [START runtime]
+runtime: python
+env: flex
+manual_scaling:
+  instances: 2
+
+entrypoint: gunicorn -b :$PORT mysite.wsgi
+
+beta_settings:
+    cloud_sql_instances: swendle-flex:europe-west1:swendle-flex
+
+handlers:
+- url: /.*
+  script: user_profile.app
+
+runtime_config:
+  python_version: 3
+
+skip_files:
+- ^/management$
+- ^parse\.py$
+- ^(.*/)?parse.py$
+- ^(.*/)?management$
+- ^update_migrations.sh$
+# [END runtime]
+

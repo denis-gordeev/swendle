@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>{{article.title}}</h3>
+<h4>Subjectivity is {{article.subjectivity}}</h4>
+<p>The number of spelling mistakes is {{article.spelling}}</p>
+ <img src="{{article.image_url}}" alt="" style="max-width:678px">
+<p>{{article.text | safe}}</p>
+<small>{% for kw in keywords %}    <a href="/keywords/{{kw}}">{{kw}}</a>     {% endfor %}</small>
+</br>
+<h3>Facts</h3>
+{% for f in facts %}
+Upvoted is: {{f.upvoted}}
+Downvoted is: {{f.downvoted}}
+<form id="upvote" method="post" action="/api/facts/{{f.id}}/upvote/">
+  <input type="hidden" name="name" value="value" /> 
+  <a onclick="document.getElementById('upvote').submit();">Upvote</a>
+</form>
+<form id="downvote" method="post" action="/api/facts/{{f.id}}/downvote/">
+  <input type="hidden" name="name" value="value" /> 
+  <a onclick="document.getElementById('downvote').submit();">Downvote</a>
+</form>
+<span>{{f.id}}</span>
+<p><small>{{f}}</small></p>
+{% endfor %}
+
+{% endblock %}

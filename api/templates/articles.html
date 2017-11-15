@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% for a in articles %}
+<h3><a href='/articles/{{a.pk}}'>{{a.fields.title}}</a></h3>
+{{a.fields.url}}
+<div>{{a.fields.text | safe}}</div>
+<small>{% for kw in a.keywords %}    <a href="/keywords/{{kw}}">{{kw}}</a>     {% endfor %}</small>
+
+
+{% endfor %}
+{% endblock %}

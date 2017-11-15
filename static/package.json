@@ -1,0 +1,17 @@
+{
+  "name": "static",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "chart.js": "~2.1.6",
+    "jquery": "~3.2.1",
+    "metro-dist": "~3.0.17"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause"
+}

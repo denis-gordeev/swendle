@@ -1,0 +1,88 @@
+{% load staticfiles %}
+<html>
+<head>
+	<title>Swendle</title>
+
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+	<link rel="icon" type="image/png" href="{% static 'favicon.ico' %}">
+	<link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" type="text/css" href="{% static 'article.css' %}" />
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script src="{% static '/node_modules/metro-dist/js/metro.js' %}"></script>
+
+	<link rel="stylesheet" href="{% static '/node_modules/metro-dist/css/metro.min.css' %}">
+	<link rel="stylesheet" href="{% static '/node_modules/metro-dist/css/metro-colors.min.css' %}">
+	<link rel="stylesheet" href="{% static '/node_modules/metro-dist/css/metro-schemes.min.css' %}">
+	<link rel="stylesheet" href="{% static '/node_modules/metro-dist/css/metro-icons.min.css' %}">
+	<link rel="stylesheet" href="{% static '/node_modules/metro-dist/css/metro-responsive.min.css' %}">
+	<link rel="stylesheet" href="{% static '/node_modules/metro-dist/css/metro-rtl.min.css' %}">
+</head>
+
+<body>
+<div class="page-header">
+	<a href="/"><img src="{% static 'logo.png' %}" class="logo"></img></a>
+	<div class="header-user">
+{% if user.avatar == None %}
+    <img src="{% static 'avatar.png' %}" class="img-circle avatar">
+{% else %}
+    <img src="{{user.avatar}}"/>
+{% endif %}
+		{{user}}
+	</div>
+
+</div>
+<nav class="navbar navbar bg-inverse">
+	<div class="container-fluid">
+		<div class="navbar-header"></div>
+		<ul class="nav navbar-nav">
+			{% for c in clusters|slice:":" %}
+			<li><a href="/topic/{{c}}" class="text-primary">{{c|title}}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+</nav>
+
+<div class="container" id="stories">
+{% block content %}
+{% endblock %}
+</div>
+<script src="{% static 'my.js' %}"></script>
+
+<div class="footer">
+	<div class="footer-text">
+		<div class="column first">
+			<img src="{% static 'logo-white-2.png' %}" alt="Logo-white" class="logo-white">
+		</div>
+		<div class="column">
+			<h5>Regions</h5>
+			<p>UK</p>
+			<p>Africa</p>
+			<p>Americas</p>
+			<p>Asia</p>
+			<p>China</p>
+			<p>Europe</p>
+			<p>Middle East</p>
+		</div>
+		<div class="column">
+			<h5>Tech</h5>
+			<p>Business</p>
+			<p>Culture</p>
+			<p>Gadgets</p>
+			<p>Future</p>
+			<p>Startups</p>
+		</div>
+		<div class="column">
+			<h5>Travel</h5>
+			<p>Wonder</p>
+			<p>Food & Drink</p>
+			<p>Play</p>
+			<p>Stay</p>
+		</div>
+	</div>
+</div>
+</body>
+</html>	

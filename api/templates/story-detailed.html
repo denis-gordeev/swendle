@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Story</hd>
+{% for a in  story.0.articles %} <a href="/articles/{{a.id}}"><h3>{{a.title}}</h3></a> <img src="{{a.image_url}}" alt="" style="width:200;height:200;">     {% endfor %}
+
+{% endblock %}

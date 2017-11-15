@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <a href="/stories/{{stories.0.pk}}">
+    <div class="tile-big tile-wide-y" data-role="tile" id="top">
+        <div class="tile-content">
+            <div class="panel" style="height: 100%">
+                <div class="content fg-dark clear-float color" style="height:100%">
+                    <div class="story-image">
+                    <img src="{{stories.0.articles.0.image_url}}" class="place-left">
+                    </div>
+                    <div class="story-text">
+                    <p class="story-title">{{stories.0.fields.story_name}}</p>
+                    <div class="story-stats">Subjectivity: {{stories.0.articles.0.subjectivity}}% </br>
+                    Spelling: {{stories.0.articles.0.spelling}}%</div>
+					<span class="source">Courtesy: {{ stories.0.articles.0.source}}</span>
+                    <span class="source">*{{ stories.0.articles|length|add:"-1" }} other sources</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+	</a>
+
+{% for story in stories|slice:"1:3" %}
+    <a href="/stories/{{story.pk}}">
+    <div class="tile-big tile-wide-y" data-role="tile" id="lower">
+        <div class="tile-content">
+            <div class="panel" style="height: 100%">
+                <div class="content fg-dark clear-float color" style="height:100%">
+                <div class="story-image">
+                    <img src="{{story.articles.0.image_url}}" class="place-left">
+                </div>
+                    <p class="story-title">{{story.fields.story_name}}</p>
+                    <div class="story-stats">Subjectivity: {{story.articles.0.subjectivity}}% </br>
+                    Spelling: {{story.articles.0.spelling}}%</div>
+					<span class="source">Courtesy: {{ stories.0.articles.0.source}}</span>
+                    <span class="source">*{{ story.articles|length|add:"-1" }} other sources</span>
+                </div>
+            </div>
+        </div>
+	</div>
+    </a>
+
+{% endfor %}
+<div class="tile-big tile-wide-y" data-role="tile" id="recommended">
+<div class="tile-content" style="height:100%">
+<div class="content fg-dark clear-float color" style="height:100%">
+<p class="story-title">RECOMMENDED<br/>NEWS</p>
+<div class="recommended_news">
+{% for story in stories|slice:"3:7" %}
+<a href="/stories/{{story.pk}}">
+    <img src="{{story.articles.0.image_url}}" class="small-news">
+    <span class="recommended_news">{{story.fields.story_name}}</span>
+</a>
+<hr class="recommended_news"> 
+{% endfor %}
+</div>
+</div>
+</div>
+</div>
+
+<div class="tile-big tile-wide-y" data-role="tile" id="featured">
+<div class="tile-content" style="height:100%">
+<div class="content fg-dark clear-float" style="height:100%" id="featured">
+<p class="story-title" id="featured_news">FEATURED<br/>NEWS</p>
+<div class="featured_news">
+{% for story in stories|slice:"7:11" %}
+<a href="/stories/{{story.pk}}">
+    <img src="{{story.articles.0.image_url}}" class="small-news">
+    <span class="featured_news">{{story.fields.story_name}}</span>
+</a>
+<hr class="featured_news">
+{% endfor %}
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

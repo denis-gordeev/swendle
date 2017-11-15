@@ -1,0 +1,7 @@
+management
+**.zip
+google-cloud-sdk
+pngs
+cloud_sql_proxy
+env
+__pycache__

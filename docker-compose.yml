@@ -1,0 +1,2 @@
+environment:
+	- PYTHONUNBUFFERED=0
