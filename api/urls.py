@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from rest_framework import routers
-from allauth.account.views import confirm_email as allauthemailconfirmation
+from allauth.account.views import confirm_email
 from . import views
 
 
@@ -118,7 +118,8 @@ router.register(r'accounts', views.UserApiViewSet, 'users')
 
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-
+    url(r'^api/auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
+        confirm_email, name="account_confirm_email"),
     url(r'^articles.json$', views.ArticlesView.as_view(),
         name='articles-json'),
     url(r'^articles/(?P<pk>\d+).json$', views.ArticleDetailedView.as_view(),
@@ -149,8 +150,6 @@ urlpatterns = [
         '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.null_view, name='password_reset_confirm'),
     url(r'^api/', include(router.urls)),
-    url(r'^api/auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$',
-        allauthemailconfirmation, name="account_confirm_email"),
     url(r'^api/auth/registration/', include('rest_auth.registration.urls')),
 
     url(r'^api/auth/password/reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/'

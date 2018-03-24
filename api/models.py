@@ -39,7 +39,9 @@ class Story(models.Model):
     image = models.ImageField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
     story_cluster = models.ForeignKey(Cluster, blank=True,
-                                      null=True, related_name='story_cluster')
+                                      null=True, related_name='story_cluster',
+                                      on_delete = models.CASCADE)
+
 
     def __str__(self):
         return self.story_name
@@ -76,7 +78,8 @@ class Source(models.Model):
 class Article(models.Model):
     article_id = models.AutoField(primary_key=True)
     story_id = models.ForeignKey(Story, blank=True,
-                                 null=True, related_name='articles')
+                                 null=True, related_name='articles',
+                                 on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True)
     authors = models.CharField(max_length=200, null=True, blank=True)
     image = models.ImageField(blank=True, null=True)
@@ -91,12 +94,14 @@ class Article(models.Model):
     hotness = models.IntegerField(blank=True, null=True, default=0)
     spelling = models.IntegerField(blank=True, null=True)
     grammar = models.IntegerField(blank=True, null=True)
-    party_id = models.ForeignKey(Party, blank=True, null=True)
+    party_id = models.ForeignKey(Party, blank=True, null=True,
+                                 on_delete=models.CASCADE)
     party_subjectivity_article = models.IntegerField(blank=True, null=True)
-    source_id = models.ForeignKey(Source)
+    source_id = models.ForeignKey(Source, on_delete=models.CASCADE)
     article_cluster = models.ForeignKey(Cluster, blank=True,
                                         null=True,
-                                        related_name='article_cluster')
+                                        related_name='article_cluster',
+                                        on_delete=models.CASCADE)
     wrong_cluster = models.ManyToManyField(MyUser,
                                            related_name='wrong_cluster')
     wrong_story = models.ManyToManyField(MyUser,
@@ -110,7 +115,8 @@ class Article(models.Model):
 
 
 class Fact(models.Model):
-    article = models.ForeignKey(Article, related_name='fact_article')
+    article = models.ForeignKey(Article, related_name='fact_article',
+                                on_delete=models.CASCADE)
     sentence_id = models.IntegerField()
     text = models.CharField(max_length=5000, null=True)
     upvoted = models.IntegerField(default=0)
@@ -118,7 +124,7 @@ class Fact(models.Model):
     downvoted = models.IntegerField(default=0)
     downvoted_by = models.ManyToManyField(MyUser, related_name='fact_downv_by')
     user = models.ForeignKey(MyUser, related_name='fact_user', null=True,
-                             blank=True)
+                             blank=True, on_delete=models.CASCADE)
     'fact="{}" sent_id="{}"'
     def __str__(self):
         return self.text
@@ -135,12 +141,15 @@ class Fact(models.Model):
 
 class Comment(models.Model):
     article_id = models.ForeignKey(Article, blank=True,
-                                   null=True, related_name='comm_article')
+                                   null=True, related_name='comm_article',
+                                   on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True)
     text = models.TextField()
-    user = models.ForeignKey(MyUser, related_name='comm_user')
+    user = models.ForeignKey(MyUser, related_name='comm_user',
+                             on_delete=models.CASCADE)
     recipient = models.ForeignKey(MyUser, null=True, blank=True,
-                                  related_name='comm_recipient')
+                                  related_name='comm_recipient',
+                                  on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
     upvoted = models.IntegerField(default=0)
     upvoted_by = models.ManyToManyField(MyUser, related_name='com_upv_by')
@@ -154,11 +163,13 @@ class Comment(models.Model):
 
 class Citation(models.Model):
     fact_id = models.ForeignKey(Fact, blank=True,
-                                null=True, related_name='cit_fact')
+                                null=True, related_name='cit_fact',
+                                on_delete=models.CASCADE)
     text = models.TextField()
     description = models.TextField(blank=True, null=True)
     url = models.URLField(blank=True, null=True)
-    user = models.ForeignKey(MyUser, related_name='cit_user')
+    user = models.ForeignKey(MyUser, related_name='cit_user',
+                             on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
     upvoted = models.IntegerField(default=0)
     upvoted_by = models.ManyToManyField(MyUser, related_name='cit_upv_by')
@@ -173,12 +184,15 @@ class Citation(models.Model):
 
 class CitationComment(models.Model):
     citation_id = models.ForeignKey(Citation, blank=True,
-                                    null=True, related_name='comm_citation')
+                                    null=True, related_name='comm_citation',
+                                    on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True)
     text = models.TextField()
-    user = models.ForeignKey(MyUser, related_name='cit_comm_user')
+    user = models.ForeignKey(MyUser, related_name='cit_comm_user',
+                             on_delete=models.CASCADE)
     recipient = models.ForeignKey(MyUser, null=True, blank=True,
-                                  related_name='cit_comm_recipient')
+                                  related_name='cit_comm_recipient',
+                                  on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
     upvoted = models.IntegerField(default=0)
     upvoted_by = models.ManyToManyField(MyUser, related_name='cit_com_upv_by')
