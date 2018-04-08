@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.shortcuts import render_to_response, render
 from django.views.generic import DetailView
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 # from django.contrib.auth.models import User
 # from rest_framework import generics
 from rest_framework import viewsets
@@ -40,10 +42,10 @@ from api.serializers import (ArticleSerializer, StorySerializer,
                              VerifyEmailSerializer)
 
 
+@cache_page(60 * 60)
 @api_view()
 def null_view(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class ArticlesView(DetailView):
@@ -59,6 +61,7 @@ class ArticlesView(DetailView):
         for i in range(len(self.articles)):
             self.articles[i]['keywords'] = self.keywords[i]
 
+    @method_decorator(cache_page(60 * 60))
     def get(self, request):
         uri = request.build_absolute_uri()
         if '.json' in uri:
@@ -108,6 +111,7 @@ class StoriesView(DetailView):
             self.stories[i]['cluster'] = self.clusters[i]
             self.stories[i]['keywords'] = self.keywords[i][:10]
 
+    @method_decorator(cache_page(60 * 60))
     def get(self, request):
         uri = request.build_absolute_uri()
         if '.json' in uri:
@@ -121,6 +125,7 @@ class StoriesView(DetailView):
 
 
 class KeywordView(DetailView):
+    @method_decorator(cache_page(60 * 60))
     def get(self, request, slug, **kwargs):
         slug = slug.replace('%20', ' ')
         uri = request.build_absolute_uri()
@@ -134,6 +139,7 @@ class KeywordView(DetailView):
 
 
 class StoryDetailedView(DetailView):
+    @method_decorator(cache_page(60 * 60))
     def get(self, request, pk):
         uri = request.build_absolute_uri()
         story = [Story.objects.get(pk=pk)]
@@ -158,6 +164,7 @@ class StoryDetailedView(DetailView):
 
 
 class ArticleDetailedView(DetailView):
+    @method_decorator(cache_page(60 * 60))
     def get(self, request, pk):
         uri = request.build_absolute_uri()
         article = Article.objects.get(pk=pk)
@@ -183,11 +190,13 @@ class ArticleApiViewSet(viewsets.ModelViewSet):
     facts = Fact.objects.all()
     queryset = Article.objects.all()
 
+    cache_page(60 * 60)
     def get_serializer_class(self):
         if self.action == 'list':
             return ArticleSerializerShort
         return ArticleSerializer
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route()
     def article(self, request, *args, **kwargs):
         article = self.get_object()
@@ -198,11 +207,13 @@ class StoryApiViewSet(viewsets.ModelViewSet):
     queryset = Story.objects.all()
     serializer_class = StorySerializer
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route()
     def story(self, request, *args, **kwargs):
         story = self.get_object()
         return Response(story)
 
+    @method_decorator(cache_page(60 * 60))
     @list_route()
     def recommended(self, request, *args, **kwargs):
         # user = request.user
@@ -210,6 +221,7 @@ class StoryApiViewSet(viewsets.ModelViewSet):
         serializer = StorySerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @method_decorator(cache_page(60 * 60))
     @list_route()
     def featured(self, request, *args, **kwargs):
         # user = request.user
@@ -221,6 +233,7 @@ class StoryApiViewSet(viewsets.ModelViewSet):
 class KeywordViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
 
+    cache_page(60 * 60)
     def get_serializer_class(self):
         if self.action == 'list':
             return KeywordSerializerShort
@@ -229,6 +242,8 @@ class KeywordViewSet(viewsets.ModelViewSet):
 
 
 class TopicView(DetailView):
+
+    @method_decorator(cache_page(60 * 60))
     def get(self, request, slug, **kwargs):
         uri = request.build_absolute_uri()
         posts = Story.objects.filter(story_cluster__cluster_name=slug)
@@ -247,12 +262,14 @@ class FactApiViewSet(viewsets.ModelViewSet):
     permission_classes = (POSTOnlyAuthentication,)
     user_serializer = UserSerializer
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['get'])
     def fact(self, request, format=None):
         if request.method == 'GET':
             fact = self.get_object()
             return Response(fact)
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def upvote(self, request, format=None, *args, **kwargs):
         # user = CurrentUserDefault() 
@@ -266,6 +283,7 @@ class FactApiViewSet(viewsets.ModelViewSet):
         else:
             return Response('You have already voted')
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def downvote(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -278,6 +296,7 @@ class FactApiViewSet(viewsets.ModelViewSet):
         else:
             return Response('You have already voted')
 
+    @method_decorator(cache_page(60 * 60))
     @list_route(methods=['post'])
     def create_fact(self, request, format=None, *args, **kwargs):
         article = request.data['article']
@@ -322,12 +341,14 @@ class CommentApiViewSet(viewsets.ModelViewSet):
     permission_classes = (POSTOnlyAuthentication,)
     user_serializer = UserSerializer
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['get'])
     def comment(self, request, format=None):
         if request.method == 'GET':
             comment = self.get_object()
             return Response(comment)
 
+    @method_decorator(cache_page(60 * 60))
     @list_route(methods=['post'])
     def create_comment(self, request, format=None, *args, **kwargs):
 
@@ -345,6 +366,7 @@ class CommentApiViewSet(viewsets.ModelViewSet):
             comment.save()
         return(Response('Comment added'))
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def upvote(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -357,6 +379,7 @@ class CommentApiViewSet(viewsets.ModelViewSet):
         else:
             return Response('You have already voted')
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def downvote(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -369,6 +392,7 @@ class CommentApiViewSet(viewsets.ModelViewSet):
         else:
             return Response('You have already voted')
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def report(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -388,12 +412,14 @@ class CitationApiViewSet(viewsets.ModelViewSet):
     permission_classes = (POSTOnlyAuthentication,)
     user_serializer = UserSerializer
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['get'])
     def comment(self, request, format=None):
         if request.method == 'GET':
             citation = self.get_object()
             return Response(citation)
 
+    @method_decorator(cache_page(60 * 60))
     @list_route(methods=['post'])
     def create_citation(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -417,6 +443,7 @@ class CitationApiViewSet(viewsets.ModelViewSet):
         else:
             return(Response('Not provided all fields'))
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def upvote(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -429,6 +456,7 @@ class CitationApiViewSet(viewsets.ModelViewSet):
         else:
             return Response('You have already voted')
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def downvote(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -441,6 +469,7 @@ class CitationApiViewSet(viewsets.ModelViewSet):
         else:
             return Response('You have already voted')
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['post'])
     def report(self, request, format=None, *args, **kwargs):
         user = request.user
@@ -454,6 +483,7 @@ class CitationApiViewSet(viewsets.ModelViewSet):
 
 
 class ClusterApiViewSet(viewsets.ModelViewSet):
+    cache_page(60 * 60)
     def get_serializer_class(self):
         if self.action == 'list':
             return ClusterSerializerShort
@@ -463,11 +493,14 @@ class ClusterApiViewSet(viewsets.ModelViewSet):
     # serializer_class = ClusterSerializerShort
     lookup_field = 'cluster_name'
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route()
     def cluster(self, request, pk, *args, **kwargs):
         self.serializer_class = ClusterSerializer
         cluster = self.get_object()
         return Response(cluster)
+
+    @method_decorator(cache_page(60 * 60))
     @detail_route()
     def combined_view(self, request, *args, **kwargs):
         pk = kwargs['cluster_name']
@@ -490,11 +523,14 @@ class ClusterApiViewSet(viewsets.ModelViewSet):
         elif pk == 'Entertainment':
             clusters = ['music', 'videogames', 'TV', 'movies', 'festivals',
                         'entertainment']
-        queryset = Article.objects.filter(
-            article_cluster__cluster_name__in=clusters)
-        serializer = ArticleSerializerShort(queryset, many=True)
+        print(request)
+        queryset = Story.objects.filter(
+            story_cluster__cluster_name__in=clusters)
+        serializer = StorySerializerShort(queryset, many=True)
         # lol = serializers.serialize("json", queryset)
         return Response(serializer.data)
+
+    @method_decorator(cache_page(60 * 60))
     @list_route()
     def combined(self, request, *args, **kwargs):
         clusters = ['Global', 'Politics', 'Business', 'Health', 'Society',
@@ -514,7 +550,8 @@ class CitationCommentApiViewSet(viewsets.ModelViewSet):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (POSTOnlyAuthentication,)
     user_serializer = UserSerializer
-
+    
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['get'])
     def comment(self, request, format=None):
         if request.method == 'GET':
@@ -568,9 +605,11 @@ class VerifyEmailView(APIView, ConfirmEmailView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
+    @method_decorator(cache_page(60 * 60))
     def get_serializer(self, *args, **kwargs):
         return VerifyEmailSerializer(*args, **kwargs)
-
+    
+    @method_decorator(cache_page(60 * 60))
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -584,6 +623,7 @@ class UserApiViewSet(viewsets.ModelViewSet):
     queryset = MyUser.objects.all()
     serializer_class = UserSerializer
 
+    @method_decorator(cache_page(60 * 60))
     @detail_route(methods=['get'])
     def user(self, request, format=None):
         if request.method == 'GET':

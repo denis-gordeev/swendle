@@ -158,11 +158,11 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class ClusterSerializer(serializers.ModelSerializer):
-    article_cluster = ArticleSerializerShort(many=True)
-
+    # article_cluster = ArticleSerializerShort(many=True)
+    story_cluster = StorySerializerShort(many=True)
     class Meta:
         model = Cluster
-        fields = ('cluster_id', 'cluster_name', 'article_cluster')
+        fields = ('cluster_id', 'cluster_name', 'story_cluster')
 
     def to_representation(self, obj):
         return super(ClusterSerializer, self).to_representation(obj)

@@ -166,7 +166,9 @@ AUTHENTICATION_BACKENDS = (
 
 
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 5,
+    'limit_query_param': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.permissions.POSTOnlyAuthentication',
         # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',

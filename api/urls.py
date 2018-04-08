@@ -94,7 +94,7 @@ class Router(routers.DefaultRouter):
     All topics (clusters) are in
 [*/api/clusters](/api/clusters/)
 
-    A call to a particular cluster will retrieve the list of all articles on
+    A call to a particular cluster will retrieve the list of all stories on
     this topic
 
 [*/api/clusters/uk/](/api/clusters/uk)
