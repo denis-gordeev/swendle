@@ -7,7 +7,14 @@ from taggit.models import Tag
 from taggit_serializer.serializers import (TagListSerializerField,
                                            TaggitSerializer)
 from api.models import (Article, Story, Fact, Comment,
-                        Citation, Cluster, CitationComment, MyUser)
+                        Citation, Cluster, CitationComment, MyUser, Source)
+
+
+class SourceSerializer(serializers.ModelSerializer):
+    source = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Source
 
 
 class CitationCommentSerializer(serializers.ModelSerializer):
@@ -63,7 +70,7 @@ class ArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
     keywords = TagListSerializerField()
     fact_article = FactSerializer(many=True)
     comm_article = CommentSerializer(many=True)
-
+    source_name = serializers.CharField(source='source_id.name', read_only=True)
     class Meta:
         model = Article
         fields = ('fact_article', 'comm_article', 'article_id', 'story_id',
@@ -72,13 +79,14 @@ class ArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
                   'image_url',
                   'url', 'videos', 'summary', 'text', 'pub_date', 'keywords',
                   'subjectivity', 'hotness', 'spelling', 'grammar',
-                  'source_id')
+                  'source_id', 'source_name')
 
     def to_representation(self, obj):
         return super(ArticleSerializer, self).to_representation(obj)
 
 
 class ArticleSerializerShort(serializers.ModelSerializer):
+    source_name = serializers.CharField(source='source_id.name', read_only=True)
     class Meta:
         model = Article
         fields = ('article_id',
@@ -87,7 +95,7 @@ class ArticleSerializerShort(serializers.ModelSerializer):
                   'image_url',
                   'url', 'videos', 'summary', 'text', 'pub_date',
                   'subjectivity', 'hotness', 'spelling', 'grammar',
-                  'source_id')
+                  'source_id', 'source_name')
 
     def to_representation(self, obj):
         return super(ArticleSerializerShort, self).to_representation(obj)

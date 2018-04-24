@@ -1,12 +1,14 @@
 import json
 from django.http import HttpResponse
 from django.core import serializers
+from django.conf import settings
 from django.shortcuts import render_to_response, render
 from django.views.generic import DetailView
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 # from django.contrib.auth.models import User
 # from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
@@ -39,7 +41,8 @@ from api.serializers import (ArticleSerializer, StorySerializer,
                              CitationSerializer, ClusterSerializer,
                              ClusterSerializerShort, ArticleSerializerShort,
                              KeywordSerializerShort, CitationCommentSerializer,
-                             VerifyEmailSerializer)
+                             VerifyEmailSerializer,
+                             StorySerializerShort)
 
 
 @cache_page(60 * 60)
@@ -482,9 +485,16 @@ class CitationApiViewSet(viewsets.ModelViewSet):
             return Response('You have reported this comment')
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class ClusterApiViewSet(viewsets.ModelViewSet):
     cache_page(60 * 60)
     def get_serializer_class(self):
+        print(self.action)
         if self.action == 'list':
             return ClusterSerializerShort
         return ClusterSerializer
@@ -492,18 +502,19 @@ class ClusterApiViewSet(viewsets.ModelViewSet):
     queryset = Cluster.objects.all()
     # serializer_class = ClusterSerializerShort
     lookup_field = 'cluster_name'
+    # @method_decorator(cache_page(60 * 60))
+    # @detail_route()
+    # def cluster(self, request, pk, *args, **kwargs):
+    #     self.serializer_class = ClusterSerializer
+    #     cluster = self.get_object()
+    #     return Response(cluster)
 
     @method_decorator(cache_page(60 * 60))
-    @detail_route()
-    def cluster(self, request, pk, *args, **kwargs):
-        self.serializer_class = ClusterSerializer
-        cluster = self.get_object()
-        return Response(cluster)
-
-    @method_decorator(cache_page(60 * 60))
-    @detail_route()
-    def combined_view(self, request, *args, **kwargs):
+    # @detail_route()
+    def retrieve(self, request, *args, **kwargs):
         pk = kwargs['cluster_name']
+        pk = pk[0].upper() + pk[1:]
+        print(pk)
         if pk == "Science_&_technology":
             clusters = ['technology', 'nature', 'cars']
         elif pk == 'Global':
@@ -523,16 +534,22 @@ class ClusterApiViewSet(viewsets.ModelViewSet):
         elif pk == 'Entertainment':
             clusters = ['music', 'videogames', 'TV', 'movies', 'festivals',
                         'entertainment']
+        else:
+            clusters = []
         print(request)
+        pagination_class = StandardResultsSetPagination
+        print(pagination_class)
+        paginator = pagination_class()
         queryset = Story.objects.filter(
             story_cluster__cluster_name__in=clusters)
-        serializer = StorySerializerShort(queryset, many=True)
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = StorySerializerShort(page, many=True)
         # lol = serializers.serialize("json", queryset)
-        return Response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
     @method_decorator(cache_page(60 * 60))
-    @list_route()
-    def combined(self, request, *args, **kwargs):
+    # @list_route()
+    def list(self, request, *args, **kwargs):
         clusters = ['Global', 'Politics', 'Business', 'Health', 'Society',
                     'Entertainment', 'Sport', 'Travel',
                     'Science_&_technology']
